@@ -1,0 +1,8 @@
+target
+allure-results
+screenshot
+report
+
+.idea
+.vscode
+.DS_Store
