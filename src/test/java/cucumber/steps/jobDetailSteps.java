@@ -24,9 +24,20 @@ public class jobDetailSteps {
 
     @Given("^User open \"(.*)\"$")
     public void userOpenWith(String url) throws Exception {
-        myBrowser = browserDriver(System.getenv("browser"));
-        myBrowser.manage().window().maximize();
-        myBrowser.get(url);
+        String browser = System.getenv("browser");
+        if (continuousIntegration != null && continuousIntegration) {
+            String remoteUrl = "http://"+browser.split(":")[0]+":"+browser.split(":")[1]+"/wd/hub";
+            System.out.println(remoteUrl);
+            myBrowser = browserDriver(remoteUrl);
+            myBrowser.manage().window().maximize();
+            myBrowser.get(url);
+        }
+        else {
+            myBrowser = browserDriver(browser);
+            myBrowser.manage().window().maximize();
+            myBrowser.get(url);
+        }
+
         // pageLoad(3);
     }
 

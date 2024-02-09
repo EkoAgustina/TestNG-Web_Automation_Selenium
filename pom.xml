@@ -13,7 +13,7 @@
     <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
         <artifactId>selenium-java</artifactId>
-        <version>3.141.59</version> <!-- Ganti dengan versi terbaru Selenium -->
+        <version>4.1.2</version> <!-- Ganti dengan versi terbaru Selenium -->
     </dependency>
 
     <!-- TestNG Dependency -->

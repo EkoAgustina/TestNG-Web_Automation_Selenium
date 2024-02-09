@@ -1,8 +1,10 @@
 package helper;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+import java.net.URL;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TakesScreenshot;
@@ -13,6 +15,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 
@@ -21,6 +24,8 @@ import static mappings.mapper.*;
 public class base_screen {
     static Properties prop=new Properties();
     public static WebDriver driver;
+
+    public static Boolean continuousIntegration = Boolean.valueOf(System.getenv("CI"));
 
     /**
     * Used to provide a delay in program execution
@@ -43,22 +48,33 @@ public class base_screen {
      * Used to start a test session with the appropriate browser.
      * @param browser
      */
-    public static WebDriver browserDriver(String browser) {
-        switch (browser) {
-            case "chrome":
-                ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.addArguments("--remote-allow-origins=*","ignore-certificate-errors");
-                System.setProperty("webdriver.chrome.driver", "chromedriver");
-                driver = new ChromeDriver(chromeOptions);
-                break;
-            case "headless":
-                ChromeOptions chromeHeadless = new ChromeOptions();
-                chromeHeadless.addArguments("--remote-allow-origins=*","ignore-certificate-errors","--headless");
-                System.setProperty("webdriver.chrome.driver", "chromedriver");
-                driver = new ChromeDriver(chromeHeadless);
-                break;
-            default:
-                throw new Error("Browser not recognized");
+    public static WebDriver browserDriver(String browser) throws MalformedURLException {
+        if (continuousIntegration != null && continuousIntegration) {
+            ChromeOptions chromeOptions = new ChromeOptions();
+            chromeOptions.setPlatformName("linux");
+            chromeOptions.addArguments("--headless=new");
+            chromeOptions.addArguments("--disable-gpu");
+            chromeOptions.addArguments("--no-sandbox");
+            driver = new RemoteWebDriver(new URL(browser),chromeOptions);
+
+        }
+        else {
+            switch (browser) {
+                case "chrome":
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    chromeOptions.addArguments("--remote-allow-origins=*", "ignore-certificate-errors");
+                    System.setProperty("webdriver.chrome.driver", "chromedriver");
+                    driver = new ChromeDriver(chromeOptions);
+                    break;
+                case "headless":
+                    ChromeOptions chromeHeadless = new ChromeOptions();
+                    chromeHeadless.addArguments("--remote-allow-origins=*", "ignore-certificate-errors", "--headless");
+                    System.setProperty("webdriver.chrome.driver", "chromedriver");
+                    driver = new ChromeDriver(chromeHeadless);
+                    break;
+                default:
+                    throw new Error("Browser not recognized");
+            }
         }
         return driver;
     }
